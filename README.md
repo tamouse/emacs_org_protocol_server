@@ -24,31 +24,28 @@ Start it up:
 This will run the server on port 4567, and call
 `/usr/local/bin/emacsclient` to operate.
 
-## Command line options
+## Server Configuration
 
-The command line options are the same as for any standard Sinatra
-application:
+The server configuration is contained in the file `$HOME/.config/emacs_org_protocol_server.yml`, a standard YAML key-value pair file.
 
-    emacs-org-protocol-server [-h] [-x] [-e ENVIRONMENT] [-p PORT] [-o HOST] [-s HANDLER]
+Example (defaults):
 
-Options are:
+``` yaml
+server: [thin, mongrel, webrick]
+port: 4567
+bind: 0.0.0.0
+emacsclient: /usr/local/bin/emacsclient
+```
 
-    -h # help
-    -p # set the port (default is 4567)
-    -o # set the host (default is 0.0.0.0)
-    -e # set the environment (default is development)
-    -s # specify rack server/handler (default is thin)
-    -x # turn on the mutex lock (default is off)
+You can also specify these via the environment, which will take precedence over the configuration file and the defaults:
 
-In addition, you may set what the path to the `emacsclient`
-application is by setting the environment variable `EMACSCLIENT`. For
-example:
-
-
-    EMACSCLIENT=/usr/bin/emacsclient emacs-org-protocol-server -p 9294 -e production
-
-uses the `emacsclient` at `/usr/bin/emacsclient` running on port 9294
-in production.
+``` bash
+EMACS_ORG_PROTOCOL_CONFIG=./my_config.yml
+EMACS_ORG_PROTOCOL_BIND=127.0.0.1
+EMACS_ORG_PROTOCOL_PORT=9998
+EMACS_ORT_PROTOCOL_SERVER=thin
+EMACSCLIENT=/Application/Emacs.app/Content/MacOS/bin/emacsclient
+```
 
 ## Browser Configuration
 
