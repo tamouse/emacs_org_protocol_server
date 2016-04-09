@@ -10,8 +10,6 @@ module EmacsOrgProtocolServer
     attr_accessor :emacsclient, :server, :port, :bind, :config_file, :settings
     def initialize(server: '0.0.0.0', port: 4567, bind: '0.0.0.0', config_file: nil)
       self.config_file = config_file || ENV['EMACS_ORG_PROTOCOL_CONFIG'] || File.join(ENV['HOME'], '.config', 'emacs_org_protocol_server.yml')
-      $stderr.puts "config_file: #{self.config_file.inspect}"
-
       self.settings = {}
       if File.exist?(self.config_file)
         self.settings = YAML.load(
@@ -36,7 +34,6 @@ module EmacsOrgProtocolServer
     set :server , settings.server
     set :port   , settings.port
     set :bind   , settings.bind
-    enable :logging
 
     helpers do
       def esc(s)
@@ -62,7 +59,6 @@ module EmacsOrgProtocolServer
       emacsclient_target = "org-protocol://#{p}:#{template}//#{esc(l)}/#{esc(t)}/#{esc(s)}"
       cmd = "#{settings.emacsclient} -n '#{emacsclient_target}'"
       system(cmd)
-      $stderr.puts "ran #{cmd}"
       redirect to(params['l'])
     end
 
