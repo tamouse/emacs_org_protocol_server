@@ -1,4 +1,5 @@
 require "emacs_org_protocol_server/version"
+require 'emacs_org_protocol_server/uglify'
 require 'sinatra/base'
 require 'uri'
 require 'yaml'
@@ -62,6 +63,18 @@ module EmacsOrgProtocolServer
       redirect to(params['l'])
     end
 
+    get '/bookmarklet' do
+      bmraw = File.expand_path('../../javascripts/bookmarklet.js', __FILE__)
+      EmacsOrgProtocolServer::Uglify.new(bmraw).run!
+    end
+
+    get '/pwd' do
+      "current dir is #{Dir.pwd}"
+    end
+
+    get '/public' do
+      "contents of public folder: #{Dir['public/**/*'].join("\n")}"
+    end
   end
 
 end
