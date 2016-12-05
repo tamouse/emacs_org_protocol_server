@@ -1,21 +1,20 @@
-function fixEncoding(str) {
-  return encodeURIComponent(str)
-    .replace(/[!'()*]/g,
-      function(c) {
-        return '%' +
-          c.charCodeAt(0)
-            .toString(16);
-      }
-    );
-}
-
-var captureLink = function() {
+(function() {
   var selection = window.getSelection().toString();
   var location = window.location.href;
   var title = document.title;
   var description = document.querySelector('meta[name=description]');
   var keywords = document.querySelector('meta[name=keywords]');
   var protocol = 'capture';
+  var fixEncoding = function(str) {
+    return encodeURIComponent(str)
+      .replace(/[!'()*]/g,
+	       function(c) {
+		 return '%' +
+			c.charCodeAt(0)
+			 .toString(16);
+	       }
+      );
+  }
 
   if (description) {
     description = description.attributes.content.value.toString()
@@ -33,6 +32,4 @@ var captureLink = function() {
 
   window.location = uri;
   return uri;
-};
-
-captureLink();
+})()

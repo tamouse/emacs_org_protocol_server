@@ -27,8 +27,6 @@ module EmacsOrgProtocolServer
     end
   end
 
-
-
   class OPServ < Sinatra::Application
 
     settings = Settings.new
@@ -43,6 +41,7 @@ module EmacsOrgProtocolServer
     end
 
     get '/' do
+
       if params.empty?
         return [422, 'no params passed']
       end
@@ -59,8 +58,15 @@ module EmacsOrgProtocolServer
 
       emacsclient_target = "org-protocol://#{p}:#{template}//#{esc(l)}/#{esc(t)}/#{esc(s)}"
       cmd = "#{settings.emacsclient} -n '#{emacsclient_target}'"
+      $stderr.puts cmd
       system(cmd)
-      redirect to(params['l'])
+      if ($? == 0)
+        redirect l
+      else
+        $stderr.puts "FAILED"
+        return [422, 'command failed']
+      end
+
     end
 
     get '/bookmarklet' do
