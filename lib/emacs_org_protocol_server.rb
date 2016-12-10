@@ -1,9 +1,11 @@
 require "emacs_org_protocol_server/version"
 require 'emacs_org_protocol_server/uglify'
+require 'emacs_org_protocol_server/emacs_client_runner'
 require 'sinatra/base'
 require 'uri'
 require 'yaml'
 require 'erb'
+require 'logger'
 
 module EmacsOrgProtocolServer
 
@@ -29,6 +31,9 @@ module EmacsOrgProtocolServer
 
   class OPServ < Sinatra::Application
 
+    set :logger , Logger.new(STDOUT)
+    logger.level = Logger::DEBUG
+
     settings = Settings.new
     set :server , settings.server
     set :port   , settings.port
@@ -41,32 +46,15 @@ module EmacsOrgProtocolServer
     end
 
     get '/' do
-
-      if params.empty?
-        return [422, 'no params passed']
+      begin
+        if EmacsOrgProtocolServer::EmacsClientRunner.new(params, settings.emacsclient, logger).run!
+          redirect params['l']
+        else
+          [400, 'bad request']
+        end
+      rescue EmacsOrgProtocolServer::EmacsClientRunner::NoParameters => e
+        return [400, 'bad request']
       end
-
-      p=params['p'].to_s.downcase
-      if p.match(%r{capture})
-        template='//w'
-      else
-        template=''
-      end
-      l=params['l'].to_s
-      t=params['t'].to_s
-      s=params['s'].to_s
-
-      emacsclient_target = "org-protocol://#{p}:#{template}//#{esc(l)}/#{esc(t)}/#{esc(s)}"
-      cmd = "#{settings.emacsclient} -n '#{emacsclient_target}'"
-      $stderr.puts cmd
-      system(cmd)
-      if ($? == 0)
-        redirect l
-      else
-        $stderr.puts "FAILED"
-        return [422, 'command failed']
-      end
-
     end
 
     get '/bookmarklet' do
